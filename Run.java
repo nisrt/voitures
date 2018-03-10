@@ -26,23 +26,34 @@ public class Run {
 	    int tmpSize=0;
 	    int cpt = 0;
 	    int r;
-	    for (int i=0; i<nbTrajetsVoulu;i++) {
-	    	if(trajetsPossibles[i] == null) {continue;}
-	        int my_bonus = Utils.bonus(temps, v, trajetsPossibles[i]);
-	        int score = Utils.gain_trajet(trajetsPossibles[i])+my_bonus*bonusGlobal;
-	        int val = Math.max(1,score-trajetsPossibles[i].earliestStart*my_bonus);
-	        int cpt_tmp = cpt +val;
-	        tmp[i] = cpt_tmp;
-	        tmpSize++;
-	        cpt += cpt_tmp;
+	    int i=0;
+	    int gain=0;
+	    Trajet trajetMax = null;
+	    for (Trajet tPossible : trajetsPossibles) {
+	    	if(tPossible == null) {continue;}
+	    	if(i >= nbTrajetsVoulu) {
+	    		break;
+	    	}
+
+	        int my_bonus = Utils.bonus(temps, v, tPossible);
+	        int score = Utils.gain_trajet(tPossible)+my_bonus*bonusGlobal;
+	        gain = Math.max(0, score-Utils.dist(v.x, tPossible.startX, v.y, tPossible.startY));
+	        //int val = Math.max(0,score-tPossible.earliestStart*my_bonus);
+	        if(gain>0) {
+		        int cpt_tmp = cpt +score;
+		        tmp[i] = cpt_tmp;
+		        tmpSize++;
+		        cpt = cpt_tmp;
+		    	i+=1;
+	        }
 		}
 	    r = (int) (Math.random()*(cpt + 1));
-	    for (int i = 0; i < tmpSize;i++) {
+	    for (i = 0; i < tmpSize;i++) {
 	        if (r < tmp[i]) {
 	            return trajetsPossibles[i];
 	        }
 	    }
-		return null;
+		return trajetMax;
 	}
 
 	static int algo(Trajet[] listeTrajets,int nbTrajetsTotal,Voiture[] listeVoitures,int nbVoitures,  int tempsMax,int bonus) {
@@ -100,7 +111,7 @@ public class Run {
 	    String c = "C:\\Users\\nicoa\\eclipse-workspace\\hash\\src\\hash\\c_no_hurry.in";
 	    String d = "C:\\Users\\nicoa\\eclipse-workspace\\hash\\src\\hash\\d_metropolis.in";
 	    String e = "C:\\Users\\nicoa\\eclipse-workspace\\hash\\src\\hash\\e_high_bonus.in";
-	    String[] allInput = {c};
+	    String[] allInput = {d};
 	    int scoreTotal=0;
 	    for(String to_read : allInput) {
 	    	int maxScore=0;
